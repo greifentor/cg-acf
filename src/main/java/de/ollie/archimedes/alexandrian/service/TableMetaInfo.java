@@ -1,8 +1,10 @@
 package de.ollie.archimedes.alexandrian.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Generated;
 import lombok.experimental.Accessors;
 
 /**
@@ -11,11 +13,12 @@ import lombok.experimental.Accessors;
  * @author ollie
  *
  */
-@Data
 @Accessors(chain = true)
+@Data
+@Generated
 public class TableMetaInfo {
 
-	private List<OptionSO> options;
-	private List<StereotypeSO> stereotypes;
+	private List<OptionSO> options = new ArrayList<>();
+	private List<StereotypeSO> stereotypes = new ArrayList<>();
 
 }

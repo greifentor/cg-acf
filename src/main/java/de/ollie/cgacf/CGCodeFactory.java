@@ -20,6 +20,8 @@ import de.ollie.acf.utils.TypeManager;
 import de.ollie.archimedes.alexandrian.service.DatabaseSO;
 import de.ollie.archimedes.alexandrian.service.SchemeSO;
 import de.ollie.archimedes.alexandrian.service.TableSO;
+import de.ollie.cgacf.service.KeySOClassGenerator;
+import de.ollie.cgacf.service.ServiceImplClassGenerator;
 import de.ollie.cgacf.service.ServiceInterfaceGenerator;
 
 /**
@@ -34,6 +36,7 @@ public class CGCodeFactory implements CodeFactory {
 	private DataModel dataModel = null;
 	private GUIBundle guiBundle = null;
 	private List<CodeFactoryListener> listeners = new ArrayList<>();
+	private NameManager nameManager = new NameManager();
 
 	@Override
 	public void addCodeFactoryListener(CodeFactoryListener listener) {
@@ -46,8 +49,30 @@ public class CGCodeFactory implements CodeFactory {
 		new File(path).mkdirs();
 		DatabaseSO database = new DataModelToSOConverter().convert(this.dataModel);
 		String basePackageName = this.dataModel.getBasePackageName();
+		createServiceImplClass(database, path, basePackageName);
 		createServiceInterface(database, path, basePackageName);
+		createKeySOClass(database, path, basePackageName);
 		return false;
+	}
+
+	private void createServiceImplClass(DatabaseSO database, String path, String basePackageName) {
+		ServiceImplClassGenerator generator = new ServiceImplClassGenerator(new NameManager(), new TypeManager());
+		for (SchemeSO scheme : database.getSchemes()) {
+			for (TableSO table : scheme.getTables()) {
+				try {
+					String code = generator.generate("src/main/resources/templates", basePackageName, table);
+					String p = path + "/" + basePackageName.replace(".", "/") + "/"
+							+ new NameManager().getServiceImplClassPackageSuffix().replace(".", "/");
+					System.out.println("creating: " + p);
+					new File(p).mkdirs();
+					String fileName = new NameManager().getServiceImplClassName(table) + ".java";
+					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
+					System.out.println(p + "/" + fileName);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	private void createServiceInterface(DatabaseSO database, String path, String basePackageName) {
@@ -56,11 +81,31 @@ public class CGCodeFactory implements CodeFactory {
 			for (TableSO table : scheme.getTables()) {
 				try {
 					String code = generator.generate("src/main/resources/templates", basePackageName, table);
-					String p = path + "/" + basePackageName.replace(".", "/") + "/"
-							+ new NameManager().getServiceInterfacePackageSuffix().replace(".", "/");
+					String p = path + "/" + basePackageName.replace(".", "/") + "/" + this.nameManager
+							.getServiceInterfaceNamesProvider(table).getPackageName().replace(".", "/");
 					System.out.println("creating: " + p);
 					new File(p).mkdirs();
-					String fileName = new NameManager().getServiceInterfaceName(table) + ".java";
+					String fileName = this.nameManager.getServiceInterfaceNamesProvider(table).getClassName() + ".java";
+					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
+					System.out.println(p + "/" + fileName);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void createKeySOClass(DatabaseSO database, String path, String basePackageName) {
+		KeySOClassGenerator generator = new KeySOClassGenerator(new NameManager(), new TypeManager());
+		for (SchemeSO scheme : database.getSchemes()) {
+			for (TableSO table : scheme.getTables()) {
+				try {
+					String code = generator.generate("src/main/resources/templates", basePackageName, table);
+					String p = path + "/" + basePackageName.replace(".", "/") + "/"
+							+ this.nameManager.getKeySONamesProvider(table).getPackageName().replace(".", "/");
+					System.out.println("creating: " + p);
+					new File(p).mkdirs();
+					String fileName = this.nameManager.getKeySONamesProvider(table).getClassName() + ".java";
 					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
 					System.out.println(p + "/" + fileName);
 				} catch (Exception e) {

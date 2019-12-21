@@ -5,6 +5,7 @@ import static de.ollie.utils.Check.ensure;
 import org.apache.commons.lang3.StringUtils;
 
 import de.ollie.archimedes.alexandrian.service.ColumnSO;
+import de.ollie.archimedes.alexandrian.service.OptionSO;
 import de.ollie.archimedes.alexandrian.service.TableSO;
 
 /**
@@ -112,60 +113,77 @@ public class NameManager {
 	}
 
 	/**
-	 * Returns the name of a key service object for the passed table.
+	 * Returns the names provider for a key service object of the passed table.
 	 * 
 	 * @param table The table which the key service class name is to find for.
-	 * @return The name of a key service object for the passed table.
+	 * @return The names provider for a key service object of the passed table.
 	 */
-	public String getKeySOClassName(TableSO table) {
-		return getClassName(table) + "KeySO";
+	public NamesProvider getKeySONamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName(getClassName(table) + "KeySO") //
+				.setPackageName("service.so") //
+		;
 	}
 
 	/**
-	 * Returns a package name suffix for key service objects.
+	 * Returns a plural name for the objects linked to the passed table.
 	 * 
-	 * @return A package name suffix for key service objects.
+	 * @param table The table which the plural name is to return to.
+	 * @return The plural name from the "PLURAL" option or an english plural generated from the table name.
 	 */
-	public String getKeySOPackageNameSuffix() {
-		return "service.so";
+	public String getPluralName(TableSO table) {
+		return table.getMetaInfo().getOptions() //
+				.stream() //
+				.filter(option -> option.getName().equals("PLURAL")) //
+				.findAny() //
+				.map(OptionSO::getValue) //
+				.orElse(firstCharToLowerCase(getClassName(table)) + "s") //
+		;
 	}
 
 	/**
-	 * Returns the name of a service interface for the passed table.
+	 * Returns the name of a service impl class for the passed table.
+	 * 
+	 * @param table The table which the service impl class name is to find for.
+	 * @return The name of a service impl class for the passed table.
+	 */
+	public String getServiceImplClassName(TableSO table) {
+		return getClassName(table) + "ServiceImpl";
+	}
+
+	/**
+	 * Returns a package name suffix for service impl classes.
+	 * 
+	 * @return A package name suffix for service impl classes.
+	 */
+	public String getServiceImplClassPackageSuffix() {
+		return "service.impl";
+	}
+
+	/**
+	 * Returns the names provider for a service interface of the passed table.
 	 * 
 	 * @param table The table which the service interface name is to find for.
-	 * @return The name of a service interface for the passed table.
+	 * @return The names provider for a service interface of the passed table.
 	 */
-	public String getServiceInterfaceName(TableSO table) {
-		return getClassName(table) + "Service";
+	public NamesProvider getServiceInterfaceNamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName(getClassName(table) + "Service") //
+				.setPackageName("service") //
+		;
 	}
 
 	/**
-	 * Returns a package name suffix for service interfaces.
+	 * Returns the names provider for a service object of the passed table.
 	 * 
-	 * @return A package name suffix for service interfaces.
+	 * @param table The table which the service object name is to find for.
+	 * @return The names provider for a service object of the passed table.
 	 */
-	public String getServiceInterfacePackageSuffix() {
-		return "service";
-	}
-
-	/**
-	 * Returns the name of a data service object for the passed table.
-	 * 
-	 * @param table The table which the data service object name is to find for.
-	 * @return The name of a data service object for the passed table.
-	 */
-	public String getSOClassName(TableSO table) {
-		return getClassName(table) + "SO";
-	}
-
-	/**
-	 * Returns a package name suffix for data service objects.
-	 * 
-	 * @return A package name suffix for data service objects.
-	 */
-	public String getSOPackageNameSuffix() {
-		return "service.so";
+	public NamesProvider getSONamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName(getClassName(table) + "SO") //
+				.setPackageName("service.so") //
+		;
 	}
 
 }

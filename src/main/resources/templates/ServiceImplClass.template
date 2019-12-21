@@ -1,0 +1,89 @@
+package de.ollie.chalkous9cp.service.impl;
+
+import static de.ollie.utils.Check.ensure;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import de.ollie.chalkous9cp.service.DuckService;
+import de.ollie.chalkous9cp.service.ObjectAlreadyExistsException;
+import de.ollie.chalkous9cp.service.ObjectNotFoundException;
+import de.ollie.chalkous9cp.service.ObjectType;
+import de.ollie.chalkous9cp.service.so.DuckKeySO;
+import de.ollie.chalkous9cp.service.so.DuckSO;
+import de.ollie.chalkous9cp.service.so.actions.duck.DuckChangeActionSO;
+import de.ollie.chalkous9cp.service.so.actions.duck.DuckNameChangeActionSO;
+
+/**
+ * An implementation of the interface "DuckService".
+ *
+ * @author ollie (03.10.2019)
+ */
+public class DuckServiceImpl implements DuckService {
+
+	private Map<DuckKeySO, List<DuckChangeActionSO>> ducks = new HashMap<>();
+
+	@Override
+	public DuckKeySO createDuck(String key) throws ObjectAlreadyExistsException {
+		ensure(key != null, "key cannot be null.");
+		ensure(!key.isEmpty(), "key cannot be empty.");
+		DuckKeySO duckKey = new DuckKeySO(key);
+		if (this.ducks.containsKey(duckKey)) {
+			throw new ObjectAlreadyExistsException(key, ObjectType.FOLK);
+		}
+		List<DuckChangeActionSO> l = new ArrayList<>();
+		l.add(new DuckChangeActionSO("Created."));
+		this.ducks.put(duckKey, l);
+		return duckKey;
+	}
+
+	private Optional<List<DuckChangeActionSO>> getChangeActions(DuckKeySO key) {
+		ensure(key != null, "key cannot be null.");
+		List<DuckChangeActionSO> l = this.ducks.get(key);
+		if (l != null) {
+			return Optional.of(l);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<DuckSO> getDuck(DuckKeySO key) {
+		Optional<DuckSO> result = Optional.empty();
+		Optional<List<DuckChangeActionSO>> l = getChangeActions(key);
+		if (l.isPresent()) {
+			result = Optional.of(getDuckFromChangeActions(l.get()));
+		}
+		return result;
+	}
+
+	private DuckSO getDuckFromChangeActions(List<DuckChangeActionSO> cas) {
+		DuckSO duck = new DuckSO();
+		for (DuckChangeActionSO ca : cas) {
+			if (ca instanceof DuckNameChangeActionSO) {
+				duck.setName(((DuckNameChangeActionSO) ca).getName());
+			}
+		}
+		return duck;
+	}
+
+	@Override
+	public void setName(final DuckKeySO key, final String name) {
+		ensure(name != null, "name cannot be null.");
+		getChangeActions(key).ifPresentOrElse(new Consumer<List<DuckChangeActionSO>>() {
+			@Override
+			public void accept(List<DuckChangeActionSO> f) {
+				f.add(new DuckNameChangeActionSO(name));
+			}
+		}, new Runnable() {
+			@Override
+			public void run() {
+				throw new ObjectNotFoundException(key.getValue(), ObjectType.FOLK);
+			}
+		});
+	}
+
+}

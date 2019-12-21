@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -17,6 +18,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Data
 @NoArgsConstructor
+@Generated
 public class TableSO {
 
 	@NonNull
@@ -25,7 +27,14 @@ public class TableSO {
 	private List<ColumnSO> columns = new ArrayList<>();
 	@NonNull
 	private List<ForeignKeySO> foreignKeys = new ArrayList<>();
-	private TableMetaInfo metaInfo;
-	private TableGUIInfo guiInfo;
+	private TableMetaInfo metaInfo = new TableMetaInfo();
+	private TableGUIInfo guiInfo = new TableGUIInfo();
+
+	public TableSO addOptions(OptionSO... options) {
+		for (OptionSO option : options) {
+			this.getMetaInfo().getOptions().add(option);
+		}
+		return this;
+	}
 
 }

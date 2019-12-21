@@ -1,0 +1,31 @@
+#set( $ClassName = ${NamesProvider.getClassName()} )
+package ${BasePackageName}.service;
+
+import java.util.Optional;
+
+import ${BasePackageName}.${KeySONames.getQualifiedName()};
+import ${BasePackageName}.${SONames.getQualifiedName()};
+
+/**
+ * A service for ${SingularName} data management.
+ */
+@Generated
+public interface $ClassName {
+
+	/**
+	 * Returns the ${SingularName} service object for the passed ${SingularName} key service object.
+	 * 
+	 * @param key The ${SingularName} key service object which the ${SingularName} is to return for.
+	 * @return An optional with the ${SingularName} service object for the passed ${SingularName} key service object.
+	 * @throws IllegalArgumentException If an invalid key is passed (empty or null).
+	 */
+	Optional<${SONames.getClassName()}> findForKey(${KeySONames.getClassName()} key);
+
+	/**
+	 * Returns all available ${SingularName} keys.
+	 * 
+	 * @return All available ${SingularName} keys.
+	 */
+	${KeySONames.getClassName()}[] getAllKeys();
+
+}

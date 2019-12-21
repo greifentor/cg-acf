@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Generated;
 import lombok.experimental.Accessors;
 
 /**
@@ -12,8 +13,9 @@ import lombok.experimental.Accessors;
  * @author ollie
  *
  */
-@Data
 @Accessors(chain = true)
+@Data
+@Generated
 public class SchemeSO {
 
 	private String name;

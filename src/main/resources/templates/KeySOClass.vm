@@ -1,0 +1,41 @@
+#set( $ClassName = ${NamesProvider.getClassName()} )
+package ${BasePackageName}.service.so;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Generated;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+/**
+ * A key object for $PluralName.
+ */
+@Accessors(fluent = true)
+@AllArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
+@Generated
+public class $ClassName {
+
+#foreach($Item in $EnumIdentifier)
+	public static final $ClassName $Item = new $ClassName("$Item");
+#end
+
+	@NonNull
+	private String name;
+
+	public static ${ClassName}[] values() {
+		return new ${ClassName}[] { //
+#foreach($Item in $EnumIdentifier)
+				$Item#if( $foreach.hasNext ) //
+#else
+;
+#end
+#end
+		};
+	}
+
+}

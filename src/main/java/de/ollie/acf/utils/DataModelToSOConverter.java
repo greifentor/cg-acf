@@ -1,6 +1,7 @@
 package de.ollie.acf.utils;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import archimedes.model.ColumnModel;
 import archimedes.model.DataModel;
@@ -9,6 +10,7 @@ import archimedes.model.TableModel;
 import de.ollie.archimedes.alexandrian.service.ColumnSO;
 import de.ollie.archimedes.alexandrian.service.DatabaseSO;
 import de.ollie.archimedes.alexandrian.service.ForeignKeySO;
+import de.ollie.archimedes.alexandrian.service.OptionSO;
 import de.ollie.archimedes.alexandrian.service.ReferenceSO;
 import de.ollie.archimedes.alexandrian.service.SchemeSO;
 import de.ollie.archimedes.alexandrian.service.TableSO;
@@ -52,6 +54,7 @@ public class DataModelToSOConverter {
 				cso.setUnique(cm.isUnique());
 				tso.getColumns().add(cso);
 			}
+			tso.addOptions(getOptions(tm));
 			sso.getTables().add(tso);
 		}
 		for (TableModel tm : dataModel.getTables()) {
@@ -68,8 +71,7 @@ public class DataModelToSOConverter {
 				}
 			}
 		}
-		DatabaseSO dbso = new DatabaseSO().setName(dataModel.getName()).setSchemes(Arrays.asList(sso));
-		return dbso;
+		return new DatabaseSO().setName(dataModel.getName()).setSchemes(Arrays.asList(sso));
 	}
 
 	private TableSO getTableSOByName(String tableName, SchemeSO sso) {
@@ -88,6 +90,15 @@ public class DataModelToSOConverter {
 			}
 		}
 		return null;
+	}
+
+	private OptionSO[] getOptions(TableModel tm) {
+		return Arrays.asList(tm.getOptions()) //
+				.stream() //
+				.map(option -> new OptionSO().setName(option.getName()).setValue(option.getParameter())) //
+				.collect(Collectors.toList()) //
+				.toArray(new OptionSO[0]) //
+		;
 	}
 
 }
