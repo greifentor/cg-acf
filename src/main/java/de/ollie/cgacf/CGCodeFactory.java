@@ -31,6 +31,8 @@ import de.ollie.cgacf.service.ServiceInterfaceGenerator;
  */
 public class CGCodeFactory implements CodeFactory {
 
+	private static final String TEMPLATE_PATH = "src/main/resources/templates";
+
 	private static final Logger LOG = Logger.getLogger(CGCodeFactory.class);
 
 	private DataModel dataModel = null;
@@ -60,12 +62,12 @@ public class CGCodeFactory implements CodeFactory {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
 				try {
-					String code = generator.generate("src/main/resources/templates", basePackageName, table);
-					String p = path + "/" + basePackageName.replace(".", "/") + "/"
-							+ new NameManager().getServiceImplClassPackageSuffix().replace(".", "/");
+					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
+					String p = path + "/" + basePackageName.replace(".", "/") + "/" + this.nameManager
+							.getServiceImplClassNamesProvider(table).getPackageName().replace(".", "/");
 					System.out.println("creating: " + p);
 					new File(p).mkdirs();
-					String fileName = new NameManager().getServiceImplClassName(table) + ".java";
+					String fileName = this.nameManager.getServiceImplClassNamesProvider(table).getClassName() + ".java";
 					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
 					System.out.println(p + "/" + fileName);
 				} catch (Exception e) {
@@ -80,7 +82,7 @@ public class CGCodeFactory implements CodeFactory {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
 				try {
-					String code = generator.generate("src/main/resources/templates", basePackageName, table);
+					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
 					String p = path + "/" + basePackageName.replace(".", "/") + "/" + this.nameManager
 							.getServiceInterfaceNamesProvider(table).getPackageName().replace(".", "/");
 					System.out.println("creating: " + p);
@@ -100,7 +102,7 @@ public class CGCodeFactory implements CodeFactory {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
 				try {
-					String code = generator.generate("src/main/resources/templates", basePackageName, table);
+					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
 					String p = path + "/" + basePackageName.replace(".", "/") + "/"
 							+ this.nameManager.getKeySONamesProvider(table).getPackageName().replace(".", "/");
 					System.out.println("creating: " + p);

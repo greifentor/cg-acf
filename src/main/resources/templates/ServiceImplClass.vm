@@ -1,0 +1,47 @@
+#set( $ClassName = ${NamesProvider.getClassName()} )
+#set( $KeySOClassName = ${KeySONames.getClassName()} )
+#set( $SOClassName = ${SONames.getClassName()} )
+package ${BasePackageName}.service.impl;
+
+import static de.ollie.utils.Check.ensure;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import ${BasePackageName}.${ServiceInterface.getQualifiedName()};
+import ${BasePackageName}.${KeySONames.getQualifiedName()};
+import ${BasePackageName}.${SONames.getQualifiedName()};
+
+/**
+ * An implementation of the interface "${ServiceInterface.getClassName()}".
+ */
+public class $ClassName implements ${ServiceInterface.getClassName()} {
+
+	private Map<${KeySOClassName}, ${SOClassName}> ${PluralName} = new HashMap<>();
+
+	public $ClassName() {
+		super();
+		${ServiceInterface.getClassName()}Initializer.addSOs(this);
+	}
+
+	public void add(${SOClassName} so) {
+		this.${PluralName}.put(so.getKey(), so);
+	}
+
+	@Override
+	public Optional<${SOClassName}> findForKey(${KeySOClassName} key) {
+		ensure(key != null, "key cannot be null.");
+		${SOClassName} so = this.${PluralName}.get(key);
+		if (so != null) {
+			return Optional.of(so);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public ${KeySOClassName}[] getAllKeys() {
+		return this.${PluralName}.keySet().toArray(new ${KeySOClassName}[this.${PluralName}.size()]);
+	}
+
+}

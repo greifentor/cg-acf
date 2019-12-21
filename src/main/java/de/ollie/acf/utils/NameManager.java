@@ -142,22 +142,16 @@ public class NameManager {
 	}
 
 	/**
-	 * Returns the name of a service impl class for the passed table.
+	 * Returns the names provider for a service impl class of the passed table.
 	 * 
 	 * @param table The table which the service impl class name is to find for.
-	 * @return The name of a service impl class for the passed table.
+	 * @return The names provider for a service impl class of the passed table.
 	 */
-	public String getServiceImplClassName(TableSO table) {
-		return getClassName(table) + "ServiceImpl";
-	}
-
-	/**
-	 * Returns a package name suffix for service impl classes.
-	 * 
-	 * @return A package name suffix for service impl classes.
-	 */
-	public String getServiceImplClassPackageSuffix() {
-		return "service.impl";
+	public NamesProvider getServiceImplClassNamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName(getClassName(table) + "ServiceImpl") //
+				.setPackageName("service.impl") //
+		;
 	}
 
 	/**

@@ -17,8 +17,8 @@ import lombok.experimental.Accessors;
  */
 @Accessors(chain = true)
 @Data
-@NoArgsConstructor
 @Generated
+@NoArgsConstructor
 public class TableSO {
 
 	@NonNull

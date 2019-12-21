@@ -1,9 +1,0 @@
-	/**
-	 * Sets a new ${LowerCaseAttributeName} for the ${LowerCaseName} with the passed key.
-	 * 
-	 * @param key  The ${LowerCaseName} key service object which ${LowerCaseAttributeName} is to change for.
-	 * @param ${LowerCaseAttributeName} The ${LowerCaseAttributeName} to set.
-	 * @throws IllegalArgumentException If key or ${LowerCaseAttributeName} is passed as null.
-	 * @throws ObjectNotFoundException  If there is no ${LowerCaseName} for the passed key.
-	 */
-	void set${CamilCaseAttributeName}(${KeySOClassName} key, ${AttributeJavaType} ${LowerCaseAttributeName});

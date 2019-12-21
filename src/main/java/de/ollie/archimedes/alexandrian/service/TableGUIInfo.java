@@ -1,6 +1,8 @@
 package de.ollie.archimedes.alexandrian.service;
 
 import lombok.Data;
+import lombok.Generated;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -9,8 +11,10 @@ import lombok.experimental.Accessors;
  * @author ollie
  *
  */
-@Data
 @Accessors(chain = true)
+@Data
+@Generated
+@NoArgsConstructor
 public class TableGUIInfo {
 
 	private int x;

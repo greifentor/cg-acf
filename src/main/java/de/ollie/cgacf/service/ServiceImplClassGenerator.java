@@ -1,5 +1,11 @@
 package de.ollie.cgacf.service;
 
+import java.io.StringWriter;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+
 import de.ollie.acf.utils.NameManager;
 import de.ollie.acf.utils.TypeManager;
 import de.ollie.archimedes.alexandrian.service.TableSO;
@@ -17,17 +23,19 @@ public class ServiceImplClassGenerator extends AbstractCodeGenerator {
 	}
 
 	public String generate(String templatePath, String basePackageName, TableSO table) throws Exception {
-		/*
-		 * String code = readTemplate(templatePath, "ServiceImplClass.template"); ImportManager imports = new
-		 * ImportManager() // .add("${BasePackageName}." + this.nameManager.getKeySOPackageNameSuffix() + "." +
-		 * this.nameManager.getKeySOClassName(table)) // .add("${BasePackageName}." +
-		 * this.nameManager.getSOPackageNameSuffix() + "." + this.nameManager.getSOClassName(table)); // code = new
-		 * ReplaceManager() // // .add("ServiceInterface-SettersCodeBlock", getSettersCodeBlock(templatePath, table)) //
-		 * // .replace(code); code = new ReplaceManager() // .add("DynamicImports", imports.toCode()) // .replace(code);
-		 * code = GeneralReplaceManager.create(table) // .add("AuthorName", "ollie") // .add("BasePackageName",
-		 * basePackageName) // .add("ClassName", this.nameManager.getServiceInterfaceName(table)) //
-		 * .add("ClassPackageName", this.nameManager.getServiceInterfacePackageSuffix()) // .replace(code); return code;
-		 */
-		return "";
+		VelocityEngine velocityEngine = new VelocityEngine();
+		velocityEngine.init();
+		Template t = velocityEngine.getTemplate(templatePath + "/ServiceImplClass.vm");
+		VelocityContext context = new VelocityContext();
+		context.put("BasePackageName", basePackageName);
+		context.put("KeySONames", this.nameManager.getKeySONamesProvider(table));
+		context.put("NamesProvider", this.nameManager.getServiceImplClassNamesProvider(table));
+		context.put("PluralName", this.nameManager.getPluralName(table));
+		context.put("ServiceInterface", this.nameManager.getServiceInterfaceNamesProvider(table));
+		context.put("SingularName", this.nameManager.getClassName(table).toLowerCase());
+		context.put("SONames", this.nameManager.getSONamesProvider(table));
+		StringWriter writer = new StringWriter();
+		t.merge(context, writer);
+		return writer.toString();
 	}
 }
