@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 
 /**
  * A key object for $PluralName.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 @Accessors(fluent = true)
 @AllArgsConstructor

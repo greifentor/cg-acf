@@ -12,6 +12,8 @@ import de.ollie.chalkous9cp.service.so.FolkSO;
 
 /**
  * An implementation of the interface "FolkService".
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 public class FolkServiceImpl implements FolkService {
 

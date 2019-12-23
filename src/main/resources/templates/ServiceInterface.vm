@@ -8,6 +8,8 @@ import ${BasePackageName}.${SONames.getQualifiedName()};
 
 /**
  * A service for ${SingularName} data management.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 @Generated
 public interface $ClassName {

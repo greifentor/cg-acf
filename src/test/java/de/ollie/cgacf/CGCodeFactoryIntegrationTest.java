@@ -7,11 +7,14 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 
 import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -42,6 +45,7 @@ public class CGCodeFactoryIntegrationTest {
 		this.unitUnderTest = new CGCodeFactory();
 	}
 
+	@DisplayName("Generate method creates correct output.")
 	@ParameterizedTest
 	@ValueSource(strings = { "de/ollie/chalkous9cp/service/FolkService.java",
 			"de/ollie/chalkous9cp/service/impl/FolkServiceImpl.java",
@@ -57,6 +61,27 @@ public class CGCodeFactoryIntegrationTest {
 		this.unitUnderTest.generate(OUTPUT_PATH);
 		assertThat(new File(OUTPUT_PATH).exists(), equalTo(true));
 		String expected = new String(Files.readAllBytes(Paths.get("src/test/resources/", fileName)));
+		String generated = new String(Files.readAllBytes(Paths.get(OUTPUT_PATH, fileName)));
+		assertEquals(expected.toString(), generated.toString());
+	}
+
+	@DisplayName("Generate method does not override an already existing file.")
+	@Test
+	public void generate_FileToGenerateAlreadyExisting_DoesNotOverrideTheFile() throws Exception {
+		if (new File(OUTPUT_PATH).exists()) {
+			Files.walk(Paths.get(OUTPUT_PATH)).sorted(Comparator.reverseOrder()).map(Path::toFile)
+					.peek(f -> System.out.println("deleted: " + f.getAbsolutePath())).forEach(File::delete);
+		}
+		String fileName = "de/ollie/chalkous9cp/service/FolkService.java";
+		String expected = "Do not override this !!!";
+		new File(OUTPUT_PATH + "/de/ollie/chalkous9cp/service").mkdirs();
+		Files.write(Paths.get(OUTPUT_PATH, fileName), expected.getBytes(), StandardOpenOption.WRITE,
+				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		ModelXMLReader reader = new ModelXMLReader(new ArchimedesObjectFactory());
+		DataModel dm = (Diagramm) reader.read("src/test/resources/chalkous9.xml");
+		this.unitUnderTest.setDataModel(dm);
+		this.unitUnderTest.generate(OUTPUT_PATH);
+		assertThat(new File(OUTPUT_PATH).exists(), equalTo(true));
 		String generated = new String(Files.readAllBytes(Paths.get(OUTPUT_PATH, fileName)));
 		assertEquals(expected.toString(), generated.toString());
 	}

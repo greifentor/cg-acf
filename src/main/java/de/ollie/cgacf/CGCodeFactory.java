@@ -3,8 +3,10 @@ package de.ollie.cgacf;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 
@@ -16,6 +18,7 @@ import archimedes.model.DataModel;
 import baccara.gui.GUIBundle;
 import de.ollie.acf.utils.DataModelToSOConverter;
 import de.ollie.acf.utils.NameManager;
+import de.ollie.acf.utils.NamesProvider;
 import de.ollie.acf.utils.TypeManager;
 import de.ollie.archimedes.alexandrian.service.DatabaseSO;
 import de.ollie.archimedes.alexandrian.service.SchemeSO;
@@ -39,6 +42,7 @@ public class CGCodeFactory implements CodeFactory {
 	private GUIBundle guiBundle = null;
 	private List<CodeFactoryListener> listeners = new ArrayList<>();
 	private NameManager nameManager = new NameManager();
+	private TypeManager typeManager = new TypeManager();
 
 	@Override
 	public void addCodeFactoryListener(CodeFactoryListener listener) {
@@ -51,64 +55,38 @@ public class CGCodeFactory implements CodeFactory {
 		new File(path).mkdirs();
 		DatabaseSO database = new DataModelToSOConverter().convert(this.dataModel);
 		String basePackageName = this.dataModel.getBasePackageName();
-		createServiceImplClass(database, path, basePackageName);
-		createServiceInterface(database, path, basePackageName);
-		createKeySOClass(database, path, basePackageName);
+		createSourceFiles(database, path, basePackageName,
+				new ServiceImplClassGenerator(this.nameManager, this.typeManager),
+				this.nameManager::getServiceImplClassNamesProvider);
+		createSourceFiles(database, path, basePackageName,
+				new ServiceInterfaceGenerator(this.nameManager, this.typeManager),
+				this.nameManager::getServiceInterfaceNamesProvider);
+		createSourceFiles(database, path, basePackageName, new KeySOClassGenerator(this.nameManager, this.typeManager),
+				this.nameManager::getKeySONamesProvider);
 		return false;
 	}
 
-	private void createServiceImplClass(DatabaseSO database, String path, String basePackageName) {
-		ServiceImplClassGenerator generator = new ServiceImplClassGenerator(new NameManager(), new TypeManager());
+	private void createSourceFiles(DatabaseSO database, String path, String basePackageName,
+			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
 				try {
+					NamesProvider namesProvider = namesProviderGetter.apply(table);
 					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
-					String p = path + "/" + basePackageName.replace(".", "/") + "/" + this.nameManager
-							.getServiceImplClassNamesProvider(table).getPackageName().replace(".", "/");
-					System.out.println("creating: " + p);
-					new File(p).mkdirs();
-					String fileName = this.nameManager.getServiceImplClassNamesProvider(table).getClassName() + ".java";
-					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
-					System.out.println(p + "/" + fileName);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private void createServiceInterface(DatabaseSO database, String path, String basePackageName) {
-		ServiceInterfaceGenerator generator = new ServiceInterfaceGenerator(new NameManager(), new TypeManager());
-		for (SchemeSO scheme : database.getSchemes()) {
-			for (TableSO table : scheme.getTables()) {
-				try {
-					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
-					String p = path + "/" + basePackageName.replace(".", "/") + "/" + this.nameManager
-							.getServiceInterfaceNamesProvider(table).getPackageName().replace(".", "/");
-					System.out.println("creating: " + p);
-					new File(p).mkdirs();
-					String fileName = this.nameManager.getServiceInterfaceNamesProvider(table).getClassName() + ".java";
-					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
-					System.out.println(p + "/" + fileName);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private void createKeySOClass(DatabaseSO database, String path, String basePackageName) {
-		KeySOClassGenerator generator = new KeySOClassGenerator(new NameManager(), new TypeManager());
-		for (SchemeSO scheme : database.getSchemes()) {
-			for (TableSO table : scheme.getTables()) {
-				try {
-					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
+					String fileName = namesProvider.getClassName() + ".java";
 					String p = path + "/" + basePackageName.replace(".", "/") + "/"
-							+ this.nameManager.getKeySONamesProvider(table).getPackageName().replace(".", "/");
+							+ namesProvider.getPackageName().replace(".", "/");
+					if (new File(p + "/" + fileName).exists()) {
+						String existingFileContent = Files.readString(Paths.get(p + "/" + fileName));
+						if (!existingFileContent.contains("GENERATED CODE !!! DO NOT CHANGE !!!")) {
+							System.out.println("ignored: " + p + "/" + fileName);
+							continue;
+						}
+					}
 					System.out.println("creating: " + p);
 					new File(p).mkdirs();
-					String fileName = this.nameManager.getKeySONamesProvider(table).getClassName() + ".java";
-					Files.write(Paths.get(p + "/" + fileName), code.getBytes());
+					Files.write(Paths.get(p + "/" + fileName), code.getBytes(), StandardOpenOption.WRITE,
+							StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 					System.out.println(p + "/" + fileName);
 				} catch (Exception e) {
 					e.printStackTrace();

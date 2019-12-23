@@ -10,6 +10,8 @@ import lombok.experimental.Accessors;
 
 /**
  * A key object for folks.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 @Accessors(fluent = true)
 @AllArgsConstructor

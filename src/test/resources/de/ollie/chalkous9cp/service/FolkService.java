@@ -7,6 +7,8 @@ import de.ollie.chalkous9cp.service.so.FolkSO;
 
 /**
  * A service for folk data management.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 @Generated
 public interface FolkService {

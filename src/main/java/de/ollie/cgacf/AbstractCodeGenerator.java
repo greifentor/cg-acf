@@ -2,6 +2,7 @@ package de.ollie.cgacf;
 
 import de.ollie.acf.utils.NameManager;
 import de.ollie.acf.utils.TypeManager;
+import de.ollie.archimedes.alexandrian.service.TableSO;
 
 /**
  * A base class for CG code generators.
@@ -18,5 +19,7 @@ abstract public class AbstractCodeGenerator {
 		this.nameManager = nameManager;
 		this.typeManager = typeManager;
 	}
+
+	public abstract String generate(String templatePath, String basePackageName, TableSO table) throws Exception;
 
 }
