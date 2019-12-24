@@ -2,6 +2,7 @@ package de.ollie.archimedes.alexandrian.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Data;
 import lombok.Generated;
@@ -35,6 +36,14 @@ public class TableSO {
 			this.getMetaInfo().getOptions().add(option);
 		}
 		return this;
+	}
+
+	public Optional<OptionSO> getOptionWithName(String name) {
+		return this.metaInfo.getOptions() //
+				.stream() //
+				.filter(option -> option.getName().equals(name)) //
+				.findAny() //
+		;
 	}
 
 }

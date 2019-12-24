@@ -38,6 +38,8 @@ public class CGCodeFactory implements CodeFactory {
 
 	private static final Logger LOG = Logger.getLogger(CGCodeFactory.class);
 
+	private static final String PATH_SEPARATOR = "/";
+
 	private DataModel dataModel = null;
 	private GUIBundle guiBundle = null;
 	private List<CodeFactoryListener> listeners = new ArrayList<>();
@@ -70,77 +72,31 @@ public class CGCodeFactory implements CodeFactory {
 			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
-				try {
-					NamesProvider namesProvider = namesProviderGetter.apply(table);
-					String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
-					String fileName = namesProvider.getClassName() + ".java";
-					String p = path + "/" + basePackageName.replace(".", "/") + "/"
-							+ namesProvider.getPackageName().replace(".", "/");
-					if (new File(p + "/" + fileName).exists()) {
-						String existingFileContent = Files.readString(Paths.get(p + "/" + fileName));
-						if (!existingFileContent.contains("GENERATED CODE !!! DO NOT CHANGE !!!")) {
-							System.out.println("ignored: " + p + "/" + fileName);
-							continue;
+				if (table.getOptionWithName("DO_NOT_GENERATE").isEmpty()) {
+					try {
+						NamesProvider namesProvider = namesProviderGetter.apply(table);
+						String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
+						String fileName = namesProvider.getClassName() + ".java";
+						String p = path + PATH_SEPARATOR + basePackageName.replace(".", PATH_SEPARATOR) + PATH_SEPARATOR
+								+ namesProvider.getPackageName().replace(".", PATH_SEPARATOR);
+						if (new File(p + PATH_SEPARATOR + fileName).exists()) {
+							String existingFileContent = Files.readString(Paths.get(p + PATH_SEPARATOR + fileName));
+							if (!existingFileContent.contains("GENERATED CODE !!! DO NOT CHANGE !!!")) {
+								LOG.info("ignored: " + p + PATH_SEPARATOR + fileName);
+								continue;
+							}
 						}
+						LOG.info("creating: " + p);
+						new File(p).mkdirs();
+						Files.write(Paths.get(p + PATH_SEPARATOR + fileName), code.getBytes(), StandardOpenOption.WRITE,
+								StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+						LOG.info(p + PATH_SEPARATOR + fileName);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					System.out.println("creating: " + p);
-					new File(p).mkdirs();
-					Files.write(Paths.get(p + "/" + fileName), code.getBytes(), StandardOpenOption.WRITE,
-							StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-					System.out.println(p + "/" + fileName);
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		}
-	}
-
-	private void createApplicationClass(DatabaseSO databaseSO, String path, String basePackageName) {
-//		ApplicationClassGenerator applicationClassGenerator = new ApplicationClassGenerator(
-//				new ClassSourceModelUtils(new NameConverter(), new TypeConverter()), new NameConverter(),
-//				new TypeConverter());
-//		ClassSourceModel csm = applicationClassGenerator.generate(databaseSO, "rest-acf");
-//		csm.getPackageModel().setPackageName(
-//				csm.getPackageModel().getPackageName().replace("${base.package.name}", basePackageName));
-//		String p = path + "/" + csm.getPackageModel().getPackageName().replace(".", "/");
-//		new File(p).mkdirs();
-//		String code = new ModelToJavaSourceCodeConverter().classSourceModelToJavaSourceCode(csm);
-//		code = code.replace("${base.package.name}", basePackageName);
-//		try {
-//			Files.write(Paths.get(p + "/" + csm.getName() + ".java"), code.getBytes());
-//			System.out.println(p + "/" + csm.getName() + ".java");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-	}
-
-	private void createApplicationProperties(DatabaseSO databaseSO, String path) {
-//		String p = path + "/../resources";
-//		String fileName = "application.properties";
-//		new File(p).mkdirs();
-//		String code = new ApplicationPropertiesGenerator(
-//				new ClassSourceModelUtils(new NameConverter(), new TypeConverter()), new NameConverter())
-//						.generate(databaseSO);
-//		try {
-//			Files.write(Paths.get(p + "/" + fileName), code.getBytes());
-//			System.out.println(p + "/" + fileName);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-	}
-
-	private void createInitialDBXML(DatabaseSO databaseSO, String path, String authorName) {
-//		String p = path + "/../resources/db/change-log/InitialDB";
-//		String fileName = "InitialDB.xml";
-//		new File(p).mkdirs();
-//		String code = new InitialDBXMLGenerator(new ClassSourceModelUtils(new NameConverter(), new TypeConverter()),
-//				new NameConverter(), new TypeConverter()).generate(databaseSO, authorName);
-//		try {
-//			Files.write(Paths.get(p + "/" + fileName), code.getBytes());
-//			System.out.println(p + "/" + fileName);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 
 	@Override
@@ -155,44 +111,40 @@ public class CGCodeFactory implements CodeFactory {
 
 	@Override
 	public GUIBundle getGUIBundle() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.guiBundle;
 	}
 
 	@Override
 	public ModelChecker[] getModelCheckers() {
-		// TODO Auto-generated method stub
-		return new ModelChecker[0];
+		return new ModelChecker[] { //
+		};
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Character Generator Code Factory";
 	}
 
 	@Override
 	public String[] getResourceBundleNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return new String[] { //
+				"cgcf" //
+		};
 	}
 
 	@Override
 	public String getVersion() {
-		// TODO Auto-generated method stub
-		return null;
+		return "1.1.1";
 	}
 
 	@Override
-	public void setGUIBundle(GUIBundle arg0) {
-		// TODO Auto-generated method stub
-
+	public void setGUIBundle(GUIBundle guiBundle) {
+		this.guiBundle = guiBundle;
 	}
 
 	@Override
-	public void setModelCheckerMessageListFrameListeners(ModelCheckerMessageListFrameListener... arg0) {
-		// TODO Auto-generated method stub
-
+	public void setModelCheckerMessageListFrameListeners(ModelCheckerMessageListFrameListener... l) {
+		// OLI Will be filled in time.
 	}
 
 }

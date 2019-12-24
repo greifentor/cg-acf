@@ -41,7 +41,7 @@ public class NameManager {
 
 	private boolean startsWithUpperCaseCharacter(String s) {
 		String firstChar = StringUtils.left(s, 1);
-		return firstChar.equals(firstChar.toUpperCase());
+		return firstChar.equals(firstChar.toUpperCase()); // NOSONAR OLI Want to see if is an upper case.
 	}
 
 	/**
@@ -104,12 +104,12 @@ public class NameManager {
 	}
 
 	private boolean allCharactersAreUpperCase(String s) {
-		return s.equals(s.toUpperCase());
+		return s.equals(s.toUpperCase()); // NOSONAR OLI Want to see if all are upper case characters.
 	}
 
 	private boolean startsWithLowerCaseCharacter(String s) {
 		String firstChar = StringUtils.left(s, 1);
-		return firstChar.equals(firstChar.toLowerCase());
+		return firstChar.equals(firstChar.toLowerCase()); // NOSONAR OLI Want to see if all are lower case characters.
 	}
 
 	/**
