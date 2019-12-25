@@ -32,9 +32,9 @@ public class $ClassName {
 	public static ${ClassName}[] values() {
 		return new ${ClassName}[] { //
 #foreach($Item in $EnumIdentifier)
-				$Item#if( $foreach.hasNext ) //
+				$Item#if( $foreach.hasNext ), //
 #else
-;
+ //
 #end
 #end
 		};
