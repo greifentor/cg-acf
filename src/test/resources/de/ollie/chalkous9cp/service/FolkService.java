@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import de.ollie.chalkous9cp.service.so.FolkKeySO;
 import de.ollie.chalkous9cp.service.so.FolkSO;
+import lombok.Generated;
 
 /**
  * A service for folk data management.

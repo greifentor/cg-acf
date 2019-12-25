@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import ${BasePackageName}.${KeySONames.getQualifiedName()};
 import ${BasePackageName}.${SONames.getQualifiedName()};
+import lombok.Generated;
 
 /**
  * A service for ${SingularName} data management.

@@ -30,9 +30,9 @@ public class FolkKeySO {
 
 	public static FolkKeySO[] values() {
 		return new FolkKeySO[] { //
-				DWARF //
-				ELF //
-				HUMAN;
+				DWARF, //
+				ELF, //
+				HUMAN //
 		};
 	}
 
