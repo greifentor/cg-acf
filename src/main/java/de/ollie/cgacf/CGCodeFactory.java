@@ -34,6 +34,9 @@ import de.ollie.cgacf.service.ServiceInterfaceGenerator;
  */
 public class CGCodeFactory implements CodeFactory {
 
+	public static final String DO_NOT_GENERATE_OPTION = "DO_NOT_GENERATE";
+	public static final String NOT_TO_OVERRIDE_MARK = "GENERATED CODE !!! DO NOT CHANGE !!!";
+
 	private static final String TEMPLATE_PATH = "src/main/resources/templates";
 
 	private static final Logger LOG = Logger.getLogger(CGCodeFactory.class);
@@ -72,30 +75,35 @@ public class CGCodeFactory implements CodeFactory {
 			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
-				if (table.getOptionWithName("DO_NOT_GENERATE").isEmpty()) {
-					try {
-						NamesProvider namesProvider = namesProviderGetter.apply(table);
-						String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
-						String fileName = namesProvider.getClassName() + ".java";
-						String p = path + PATH_SEPARATOR + basePackageName.replace(".", PATH_SEPARATOR) + PATH_SEPARATOR
-								+ namesProvider.getPackageName().replace(".", PATH_SEPARATOR);
-						if (new File(p + PATH_SEPARATOR + fileName).exists()) {
-							String existingFileContent = Files.readString(Paths.get(p + PATH_SEPARATOR + fileName));
-							if (!existingFileContent.contains("GENERATED CODE !!! DO NOT CHANGE !!!")) {
-								LOG.info("ignored: " + p + PATH_SEPARATOR + fileName);
-								continue;
-							}
-						}
-						LOG.info("creating: " + p);
-						new File(p).mkdirs();
-						Files.write(Paths.get(p + PATH_SEPARATOR + fileName), code.getBytes(), StandardOpenOption.WRITE,
-								StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-						LOG.info(p + PATH_SEPARATOR + fileName);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				if (table.getOptionWithName(DO_NOT_GENERATE_OPTION).isEmpty()) {
+					generateForTable(table, path, basePackageName, generator, namesProviderGetter);
 				}
 			}
+		}
+	}
+
+	private void generateForTable(TableSO table, String path, String basePackageName, AbstractCodeGenerator generator,
+			Function<TableSO, NamesProvider> namesProviderGetter) {
+		try {
+			NamesProvider namesProvider = namesProviderGetter.apply(table);
+			String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
+			String fileName = namesProvider.getClassName() + ".java";
+			String p = path + PATH_SEPARATOR + basePackageName.replace(".", PATH_SEPARATOR) + PATH_SEPARATOR
+					+ namesProvider.getPackageName().replace(".", PATH_SEPARATOR);
+			if (new File(p + PATH_SEPARATOR + fileName).exists()) {
+				String existingFileContent = Files.readString(Paths.get(p + PATH_SEPARATOR + fileName));
+				if (!existingFileContent.contains(NOT_TO_OVERRIDE_MARK)) {
+					LOG.info("ignored: " + p + PATH_SEPARATOR + fileName);
+					return;
+				}
+			}
+			LOG.info("creating: " + p);
+			new File(p).mkdirs();
+			Files.write(Paths.get(p + PATH_SEPARATOR + fileName), code.getBytes(), StandardOpenOption.WRITE,
+					StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			LOG.info(p + PATH_SEPARATOR + fileName);
+		} catch (Exception e) {
+			LOG.error("error while generating codr for table '" + table + "' with generator: " + generator, e);
 		}
 	}
 
