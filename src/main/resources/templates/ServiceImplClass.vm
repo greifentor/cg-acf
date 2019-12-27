@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Named;
+
 import ${BasePackageName}.${ServiceInterface.getQualifiedName()};
 import ${BasePackageName}.${KeySONames.getQualifiedName()};
 import ${BasePackageName}.${SONames.getQualifiedName()};
@@ -18,6 +20,7 @@ import ${BasePackageName}.${SONames.getQualifiedName()};
  *
  * GENERATED CODE !!! DO NOT CHANGE !!!
  */
+@Named
 public class $ClassName implements ${ServiceInterface.getClassName()} {
 
 	private Map<${KeySOClassName}, ${SOClassName}> ${PluralName} = new HashMap<>();

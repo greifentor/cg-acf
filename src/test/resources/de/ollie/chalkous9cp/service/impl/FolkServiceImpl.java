@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.inject.Named;
+
 import de.ollie.chalkous9cp.service.FolkService;
 import de.ollie.chalkous9cp.service.so.FolkKeySO;
 import de.ollie.chalkous9cp.service.so.FolkSO;
@@ -15,6 +17,7 @@ import de.ollie.chalkous9cp.service.so.FolkSO;
  *
  * GENERATED CODE !!! DO NOT CHANGE !!!
  */
+@Named
 public class FolkServiceImpl implements FolkService {
 
 	private Map<FolkKeySO, FolkSO> folks = new HashMap<>();
