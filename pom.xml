@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>de.ollie</groupId>
 			<artifactId>archimedes-legacy</artifactId>
-			<version>1.82.1</version>
+			<version>1.84.1</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ollie</groupId>

@@ -7,12 +7,16 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
 import archimedes.acf.checker.ModelChecker;
 import archimedes.acf.event.CodeFactoryListener;
 import archimedes.gui.checker.ModelCheckerMessageListFrameListener;
+import archimedes.legacy.acf.event.CodeFactoryProgressionEvent;
+import archimedes.legacy.acf.event.CodeFactoryProgressionEventProvider;
+import archimedes.legacy.acf.event.CodeFactoryProgressionListener;
 import archimedes.model.CodeFactory;
 import archimedes.model.DataModel;
 import baccara.gui.GUIBundle;
@@ -32,12 +36,16 @@ import de.ollie.cgacf.service.ServiceInterfaceGenerator;
  *
  * @author O.Lieshoff (09.10.2019)
  */
-public class CGCodeFactory implements CodeFactory {
+public class CGCodeFactory implements CodeFactory, CodeFactoryProgressionEventProvider {
 
 	public static final String DO_NOT_GENERATE_OPTION = "DO_NOT_GENERATE";
 	public static final String NOT_TO_OVERRIDE_MARK = "GENERATED CODE !!! DO NOT CHANGE !!!";
 
 	private static final String TEMPLATE_PATH = "src/main/resources/templates";
+
+	private static final String FACTORY_NAME = "Charakter Generator Code Factory";
+	private static final String LABEL_STARTING = "starting";
+	private static final int MAX_PROCESSES = 3;
 
 	private static final Logger LOG = Logger.getLogger(CGCodeFactory.class);
 
@@ -46,6 +54,7 @@ public class CGCodeFactory implements CodeFactory {
 	private DataModel dataModel = null;
 	private GUIBundle guiBundle = null;
 	private List<CodeFactoryListener> listeners = new ArrayList<>();
+	private List<CodeFactoryProgressionListener> progressionListener = new ArrayList<>();
 	private NameManager nameManager = new NameManager();
 	private TypeManager typeManager = new TypeManager();
 
@@ -55,31 +64,67 @@ public class CGCodeFactory implements CodeFactory {
 	}
 
 	@Override
+	public void addCodeFactoryProgressionListener(CodeFactoryProgressionListener listener) {
+		this.progressionListener.add(listener);
+	}
+
+	@Override
 	public boolean generate(String path) {
 		LOG.info("Started code generation");
 		new File(path).mkdirs();
 		DatabaseSO database = new DataModelToSOConverter().convert(this.dataModel);
 		String basePackageName = this.dataModel.getBasePackageName();
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes",
+				LABEL_STARTING, 0, MAX_PROCESSES, null, null));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceImplClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceImplClassNamesProvider);
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Interfaces",
+				LABEL_STARTING, 1, MAX_PROCESSES, null, null));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceInterfaceGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceInterfaceNamesProvider);
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Key SO Classes", LABEL_STARTING,
+				2, MAX_PROCESSES, null, null));
 		createSourceFiles(database, path, basePackageName, new KeySOClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getKeySONamesProvider);
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes", "done", 3,
+				MAX_PROCESSES, null, null));
 		return false;
 	}
 
 	private void createSourceFiles(DatabaseSO database, String path, String basePackageName,
 			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, null, LABEL_STARTING, null, null,
+				0, countTables(database)));
+		int counter = 0;
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
+				fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, null, LABEL_STARTING,
+						null, null, counter++, null));
 				if (table.getOptionWithName(DO_NOT_GENERATE_OPTION).isEmpty()) {
 					generateForTable(table, path, basePackageName, generator, namesProviderGetter);
 				}
 			}
 		}
+	}
+
+	private int countTables(DatabaseSO database) {
+		return database.getSchemes() //
+				.stream() //
+				.map(scheme -> scheme.getTables().size()) //
+				.collect(Collectors.summingInt(Integer::intValue));
+	}
+
+	private void fireCodeFactoryProgressionEvent(CodeFactoryProgressionEvent event) {
+		this.progressionListener.forEach(listener -> {
+			try {
+				listener.progressionDetected(event);
+			} catch (Exception e) {
+				LOG.error("error while firing code factory progression event: " + event + ", listener: " + listener
+						+ ", exception: " + e.getClass().getSimpleName() + "(" + e.getMessage() + ")");
+			}
+		});
 	}
 
 	private void generateForTable(TableSO table, String path, String basePackageName, AbstractCodeGenerator generator,
@@ -146,13 +191,19 @@ public class CGCodeFactory implements CodeFactory {
 	}
 
 	@Override
+	public void removeCodeFactoryProgressionListener(CodeFactoryProgressionListener listener) {
+		this.progressionListener.add(listener);
+	}
+
+	@Override
 	public void setGUIBundle(GUIBundle guiBundle) {
 		this.guiBundle = guiBundle;
 	}
 
 	@Override
-	public void setModelCheckerMessageListFrameListeners(ModelCheckerMessageListFrameListener... l) {
-		// OLI Will be filled in time.
+	public void setModelCheckerMessageListFrameListeners(ModelCheckerMessageListFrameListener... arg0) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
