@@ -17,6 +17,7 @@ import archimedes.gui.checker.ModelCheckerMessageListFrameListener;
 import archimedes.legacy.acf.event.CodeFactoryProgressionEvent;
 import archimedes.legacy.acf.event.CodeFactoryProgressionEventProvider;
 import archimedes.legacy.acf.event.CodeFactoryProgressionListener;
+import archimedes.legacy.acf.gui.StandardCodeFactoryProgressionFrameUser;
 import archimedes.model.CodeFactory;
 import archimedes.model.DataModel;
 import baccara.gui.GUIBundle;
@@ -36,7 +37,8 @@ import de.ollie.cgacf.service.ServiceInterfaceGenerator;
  *
  * @author O.Lieshoff (09.10.2019)
  */
-public class CGCodeFactory implements CodeFactory, CodeFactoryProgressionEventProvider {
+public class CGCodeFactory
+		implements CodeFactory, CodeFactoryProgressionEventProvider, StandardCodeFactoryProgressionFrameUser {
 
 	public static final String DO_NOT_GENERATE_OPTION = "DO_NOT_GENERATE";
 	public static final String NOT_TO_OVERRIDE_MARK = "GENERATED CODE !!! DO NOT CHANGE !!!";
@@ -75,33 +77,33 @@ public class CGCodeFactory implements CodeFactory, CodeFactoryProgressionEventPr
 		DatabaseSO database = new DataModelToSOConverter().convert(this.dataModel);
 		String basePackageName = this.dataModel.getBasePackageName();
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes",
-				LABEL_STARTING, 0, MAX_PROCESSES, null, null));
+				LABEL_STARTING, 0, null, MAX_PROCESSES, null));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceImplClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceImplClassNamesProvider);
-		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Interfaces",
-				LABEL_STARTING, 1, MAX_PROCESSES, null, null));
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Service Interfaces", null, LABEL_STARTING,
+				null, 1, null, MAX_PROCESSES));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceInterfaceGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceInterfaceNamesProvider);
-		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Key SO Classes", LABEL_STARTING,
-				2, MAX_PROCESSES, null, null));
+		fireCodeFactoryProgressionEvent(
+				new CodeFactoryProgressionEvent("Key SO Classes", null, LABEL_STARTING, null, 2, null, MAX_PROCESSES));
 		createSourceFiles(database, path, basePackageName, new KeySOClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getKeySONamesProvider);
-		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes", "done", 3,
-				MAX_PROCESSES, null, null));
+		fireCodeFactoryProgressionEvent(
+				new CodeFactoryProgressionEvent("Service Impl Classes", null, "done", null, 3, null, MAX_PROCESSES));
 		return false;
 	}
 
 	private void createSourceFiles(DatabaseSO database, String path, String basePackageName,
 			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
-		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, null, LABEL_STARTING, null, null,
-				0, countTables(database)));
-		int counter = 0;
+		fireCodeFactoryProgressionEvent(
+				new CodeFactoryProgressionEvent(null, null, LABEL_STARTING, 1, null, countTables(database), null));
+		int counter = 1;
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
-				fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, null, LABEL_STARTING,
-						null, null, counter++, null));
+				fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(null, table.getName(), LABEL_STARTING,
+						counter++, null, null, null));
 				if (table.getOptionWithName(DO_NOT_GENERATE_OPTION).isEmpty()) {
 					generateForTable(table, path, basePackageName, generator, namesProviderGetter);
 				}
