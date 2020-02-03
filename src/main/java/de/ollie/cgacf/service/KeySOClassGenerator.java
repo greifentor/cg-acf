@@ -44,7 +44,7 @@ public class KeySOClassGenerator extends AbstractCodeGenerator {
 		return table.getMetaInfo().getOptions() //
 				.stream() //
 				.filter(option -> option.getName().equals("KEY_VALUES")) //
-				.flatMap(option -> Arrays.asList(StringUtils.split(option.getValue(), ',')).stream()) //
+				.flatMap(option -> Arrays.asList(StringUtils.split(option.getValue(), ",\n\t ")).stream()) //
 				.collect(Collectors.toList()) //
 		;
 	}
