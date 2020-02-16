@@ -77,17 +77,17 @@ public class CGCodeFactory
 		DatabaseSO database = new DataModelToSOConverter().convert(this.dataModel);
 		String basePackageName = this.dataModel.getBasePackageName();
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes",
-				LABEL_STARTING, 0, null, MAX_PROCESSES, null));
+				LABEL_STARTING + " service impl classes generation", 0, null, MAX_PROCESSES, null));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceImplClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceImplClassNamesProvider);
-		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Service Interfaces", null, LABEL_STARTING,
-				null, 1, null, MAX_PROCESSES));
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Service Interfaces", null,
+				LABEL_STARTING + " service interfaces generation", null, 1, null, MAX_PROCESSES));
 		createSourceFiles(database, path, basePackageName,
 				new ServiceInterfaceGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceInterfaceNamesProvider);
-		fireCodeFactoryProgressionEvent(
-				new CodeFactoryProgressionEvent("Key SO Classes", null, LABEL_STARTING, null, 2, null, MAX_PROCESSES));
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Key SO Classes", null,
+				LABEL_STARTING + " key SO classes generation", null, 2, null, MAX_PROCESSES));
 		createSourceFiles(database, path, basePackageName, new KeySOClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getKeySONamesProvider);
 		fireCodeFactoryProgressionEvent(
@@ -98,15 +98,26 @@ public class CGCodeFactory
 	private void createSourceFiles(DatabaseSO database, String path, String basePackageName,
 			AbstractCodeGenerator generator, Function<TableSO, NamesProvider> namesProviderGetter) {
 		fireCodeFactoryProgressionEvent(
-				new CodeFactoryProgressionEvent(null, null, LABEL_STARTING, 1, null, countTables(database), null));
+				new CodeFactoryProgressionEvent(null, null, null, 1, null, countTables(database), null));
 		int counter = 1;
 		for (SchemeSO scheme : database.getSchemes()) {
 			for (TableSO table : scheme.getTables()) {
-				fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(null, table.getName(), LABEL_STARTING,
-						counter++, null, null, null));
+				final MessageProvider message = new MessageProvider();
 				if (table.getOptionWithName(DO_NOT_GENERATE_OPTION).isEmpty()) {
-					generateForTable(table, path, basePackageName, generator, namesProviderGetter);
+					table.getOptionWithName("GENERATE").ifPresent(s -> {
+						if (generator.getGenerationTypes().contains(s.getValue())) {
+							message.setMessage(
+									generateForTable(table, path, basePackageName, generator, namesProviderGetter));
+						} else {
+							message.setMessage("excluded table '" + table.getName() + "' with generation type: "
+									+ s.getValue() + " not in " + generator.getGenerationTypes());
+						}
+					});
+				} else {
+					message.setMessage("no generate: table=" + table.getName() + ", generator=" + generator.getName());
 				}
+				fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(null, table.getName(),
+						message.getMessage(), counter++, null, null, null));
 			}
 		}
 	}
@@ -129,8 +140,9 @@ public class CGCodeFactory
 		});
 	}
 
-	private void generateForTable(TableSO table, String path, String basePackageName, AbstractCodeGenerator generator,
+	private String generateForTable(TableSO table, String path, String basePackageName, AbstractCodeGenerator generator,
 			Function<TableSO, NamesProvider> namesProviderGetter) {
+		String message = null;
 		try {
 			NamesProvider namesProvider = namesProviderGetter.apply(table);
 			String code = generator.generate(TEMPLATE_PATH, basePackageName, table);
@@ -141,7 +153,7 @@ public class CGCodeFactory
 				String existingFileContent = Files.readString(Paths.get(p + PATH_SEPARATOR + fileName));
 				if (!existingFileContent.contains(NOT_TO_OVERRIDE_MARK)) {
 					LOG.info("ignored: " + p + PATH_SEPARATOR + fileName);
-					return;
+					return "ignored: " + p + PATH_SEPARATOR + fileName;
 				}
 			}
 			LOG.info("creating: " + p);
@@ -149,9 +161,12 @@ public class CGCodeFactory
 			Files.write(Paths.get(p + PATH_SEPARATOR + fileName), code.getBytes(), StandardOpenOption.WRITE,
 					StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 			LOG.info(p + PATH_SEPARATOR + fileName);
+			message = "written: " + p + PATH_SEPARATOR + fileName;
 		} catch (Exception e) {
 			LOG.error("error while generating codr for table '" + table + "' with generator: " + generator, e);
+			message = "error while generating codr for table '" + table + "' with generator: " + generator;
 		}
+		return message;
 	}
 
 	@Override
@@ -206,6 +221,24 @@ public class CGCodeFactory
 	public void setModelCheckerMessageListFrameListeners(ModelCheckerMessageListFrameListener... arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+}
+
+class MessageProvider {
+
+	private String message = null;
+
+	MessageProvider() {
+		super();
+	}
+
+	String getMessage() {
+		return this.message;
+	}
+
+	void setMessage(String message) {
+		this.message = message;
 	}
 
 }

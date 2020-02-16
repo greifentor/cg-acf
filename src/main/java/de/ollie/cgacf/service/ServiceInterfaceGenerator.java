@@ -1,6 +1,9 @@
 package de.ollie.cgacf.service;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -19,9 +22,10 @@ import de.ollie.cgacf.AbstractCodeGenerator;
 public class ServiceInterfaceGenerator extends AbstractCodeGenerator {
 
 	public ServiceInterfaceGenerator(NameManager nameManager, TypeManager typeManager) {
-		super(nameManager, typeManager);
+		super("ServiceInterfaceGenerator", nameManager, typeManager);
 	}
 
+	@Override
 	public String generate(String templatePath, String basePackageName, TableSO table) throws Exception {
 		VelocityEngine velocityEngine = new VelocityEngine();
 		velocityEngine.init();
@@ -36,6 +40,11 @@ public class ServiceInterfaceGenerator extends AbstractCodeGenerator {
 		StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		return writer.toString();
+	}
+
+	@Override
+	public Set<String> getGenerationTypes() {
+		return new HashSet<>(Arrays.asList(GenerationType.KEY_STORAGE.name()));
 	}
 
 }

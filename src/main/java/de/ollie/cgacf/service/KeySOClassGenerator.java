@@ -2,7 +2,9 @@ package de.ollie.cgacf.service;
 
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,9 +25,10 @@ import de.ollie.cgacf.AbstractCodeGenerator;
 public class KeySOClassGenerator extends AbstractCodeGenerator {
 
 	public KeySOClassGenerator(NameManager nameManager, TypeManager typeManager) {
-		super(nameManager, typeManager);
+		super("KeySOClassGenerator", nameManager, typeManager);
 	}
 
+	@Override
 	public String generate(String templatePath, String basePackageName, TableSO table) throws Exception {
 		VelocityEngine velocityEngine = new VelocityEngine();
 		velocityEngine.init();
@@ -38,6 +41,11 @@ public class KeySOClassGenerator extends AbstractCodeGenerator {
 		StringWriter writer = new StringWriter();
 		t.merge(context, writer);
 		return writer.toString();
+	}
+
+	@Override
+	public Set<String> getGenerationTypes() {
+		return new HashSet<>(Arrays.asList(GenerationType.KEY_STORAGE.name()));
 	}
 
 	private List<String> getKeyValues(TableSO table) {
