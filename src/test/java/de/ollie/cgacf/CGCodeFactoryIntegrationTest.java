@@ -49,8 +49,8 @@ public class CGCodeFactoryIntegrationTest {
 	@DisplayName("Generate method creates correct output.")
 	@ParameterizedTest
 	@ValueSource(strings = { "de/ollie/chalkous9cp/service/FolkService.java",
-			"de/ollie/chalkous9cp/service/impl/FolkServiceImpl.java",
-			"de/ollie/chalkous9cp/service/so/FolkKeySO.java" })
+			"de/ollie/chalkous9cp/service/impl/FolkServiceImpl.java", "de/ollie/chalkous9cp/service/so/FolkKeySO.java",
+			"de/ollie/chalkous9cp/service/GeneratedAdventurerService.java" })
 	public void generate_PassADataModel_CreatesCorrectFolkServiceInterface(String fileName) throws Exception {
 		if (new File(OUTPUT_PATH).exists()) {
 			Files.walk(Paths.get(OUTPUT_PATH)).sorted(Comparator.reverseOrder()).map(Path::toFile)

@@ -1,0 +1,19 @@
+#set( $ClassName = ${NamesProvider.getClassName()} )
+package ${BasePackageName}.service;
+
+import ${BasePackageName}.${KeySONames.getQualifiedName()};
+import lombok.Generated;
+
+/**
+ * A service for ${SingularName} data management.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
+ */
+@Generated
+public interface $ClassName {
+
+#foreach($Item in $SimpleAttributes)
+	void $Item.getSetterName()(${Item.getKeySOClassName()} key, ${Item.getTypeName()} ${Item.getAttributeName()});
+
+#end
+}

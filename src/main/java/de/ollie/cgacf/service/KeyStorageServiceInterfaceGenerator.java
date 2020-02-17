@@ -15,7 +15,7 @@ import de.ollie.archimedes.alexandrian.service.TableSO;
 import de.ollie.cgacf.AbstractCodeGenerator;
 
 /**
- * A class generator for service interfaces.
+ * A class generator for service interfaces in key storage mode.
  *
  * @author ollie (09.10.2019)
  */

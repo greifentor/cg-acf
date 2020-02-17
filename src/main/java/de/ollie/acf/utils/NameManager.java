@@ -113,6 +113,19 @@ public class NameManager {
 	}
 
 	/**
+	 * Returns the names provider for a generated service interface of the passed table.
+	 * 
+	 * @param table The table which the generated service interface name is to find for.
+	 * @return The names provider for a generated service interface of the passed table.
+	 */
+	public NamesProvider getGeneratedServiceInterfaceNamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName("Generated" + getClassName(table) + "Service") //
+				.setPackageName("service") //
+		;
+	}
+
+	/**
 	 * Returns the names provider for a key service object of the passed table.
 	 * 
 	 * @param table The table which the key service class name is to find for.
