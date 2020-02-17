@@ -29,8 +29,8 @@ import de.ollie.archimedes.alexandrian.service.DatabaseSO;
 import de.ollie.archimedes.alexandrian.service.SchemeSO;
 import de.ollie.archimedes.alexandrian.service.TableSO;
 import de.ollie.cgacf.service.KeySOClassGenerator;
-import de.ollie.cgacf.service.ServiceImplClassGenerator;
-import de.ollie.cgacf.service.ServiceInterfaceGenerator;
+import de.ollie.cgacf.service.KeyStorageServiceImplClassGenerator;
+import de.ollie.cgacf.service.KeyStorageServiceInterfaceGenerator;
 
 /**
  * A basic class for all CG code generators.
@@ -79,12 +79,12 @@ public class CGCodeFactory
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent(FACTORY_NAME, "Service Impl Classes",
 				LABEL_STARTING + " service impl classes generation", 0, null, MAX_PROCESSES, null));
 		createSourceFiles(database, path, basePackageName,
-				new ServiceImplClassGenerator(this.nameManager, this.typeManager),
+				new KeyStorageServiceImplClassGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceImplClassNamesProvider);
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Service Interfaces", null,
 				LABEL_STARTING + " service interfaces generation", null, 1, null, MAX_PROCESSES));
 		createSourceFiles(database, path, basePackageName,
-				new ServiceInterfaceGenerator(this.nameManager, this.typeManager),
+				new KeyStorageServiceInterfaceGenerator(this.nameManager, this.typeManager),
 				this.nameManager::getServiceInterfaceNamesProvider);
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Key SO Classes", null,
 				LABEL_STARTING + " key SO classes generation", null, 2, null, MAX_PROCESSES));

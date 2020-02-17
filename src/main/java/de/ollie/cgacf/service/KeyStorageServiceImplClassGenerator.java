@@ -15,26 +15,27 @@ import de.ollie.archimedes.alexandrian.service.TableSO;
 import de.ollie.cgacf.AbstractCodeGenerator;
 
 /**
- * A class generator for service interfaces.
+ * A code generator for service impl classes.
  *
- * @author ollie (09.10.2019)
+ * @author ollie (10.10.2019)
  */
-public class ServiceInterfaceGenerator extends AbstractCodeGenerator {
+public class KeyStorageServiceImplClassGenerator extends AbstractCodeGenerator {
 
-	public ServiceInterfaceGenerator(NameManager nameManager, TypeManager typeManager) {
-		super("ServiceInterfaceGenerator", nameManager, typeManager);
+	public KeyStorageServiceImplClassGenerator(NameManager nameManager, TypeManager typeManager) {
+		super("KeyStorageServiceImplClassGenerator", nameManager, typeManager);
 	}
 
 	@Override
 	public String generate(String templatePath, String basePackageName, TableSO table) throws Exception {
 		VelocityEngine velocityEngine = new VelocityEngine();
 		velocityEngine.init();
-		Template t = velocityEngine.getTemplate(templatePath + "/ServiceInterface.vm");
+		Template t = velocityEngine.getTemplate(templatePath + "/KeyStorageServiceImplClass.vm");
 		VelocityContext context = new VelocityContext();
 		context.put("BasePackageName", basePackageName);
 		context.put("KeySONames", this.nameManager.getKeySONamesProvider(table));
-		context.put("NamesProvider", this.nameManager.getServiceInterfaceNamesProvider(table));
+		context.put("NamesProvider", this.nameManager.getServiceImplClassNamesProvider(table));
 		context.put("PluralName", this.nameManager.getPluralName(table));
+		context.put("ServiceInterface", this.nameManager.getServiceInterfaceNamesProvider(table));
 		context.put("SingularName", this.nameManager.getClassName(table).toLowerCase());
 		context.put("SONames", this.nameManager.getSONamesProvider(table));
 		StringWriter writer = new StringWriter();
