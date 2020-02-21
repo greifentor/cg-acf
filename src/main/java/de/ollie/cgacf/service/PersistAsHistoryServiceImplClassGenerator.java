@@ -57,11 +57,12 @@ public class PersistAsHistoryServiceImplClassGenerator extends AbstractCodeGener
 				.stream() //
 				.filter(column -> !column.isPkMember()) //
 				.map(column -> {
-					getReferencedTable(column).ifPresent(rt -> {
+					getReferencedTable(column).ifPresentOrElse(rt -> {
 						importManager.add(this.nameManager.getKeySONamesProvider(rt).getQualifiedName());
 						importManager.add("service.so.actions.adventurer.Adventurer" + nameManager.getClassName(rt)
 								+ "ChangeActionSO");
-					});
+					}, () -> importManager.add("service.so.actions.adventurer.Adventurer"
+							+ nameManager.getClassName(column.getName()) + "ChangeActionSO"));
 					return new SimpleAttributeData( //
 							this.nameManager.columnNameToAttributeName(column), //
 							this.nameManager.getClassName(column.getName()), //

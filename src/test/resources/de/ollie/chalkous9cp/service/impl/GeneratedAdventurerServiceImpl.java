@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import de.ollie.chalkous9cp.service.AdventurerService;
+import de.ollie.chalkous9cp.service.GeneratedAdventurerService;
 import de.ollie.chalkous9cp.service.ObjectNotFoundException;
 import de.ollie.chalkous9cp.service.ObjectType;
 import de.ollie.chalkous9cp.service.so.AdventurerKeySO;
 import de.ollie.chalkous9cp.service.so.actions.adventurer.AdventurerChangeActionSO;
-import de.ollie.chalkous9cp.service.so.actions.adventurer.AdventurerNameChangeActionSO;
 import de.ollie.chalkous9cp.service.so.WayOfLifeKeySO;
 import de.ollie.chalkous9cp.service.so.actions.adventurer.AdventurerWayOfLifeChangeActionSO;
+import de.ollie.chalkous9cp.service.so.actions.adventurer.AdventurerNameChangeActionSO;
 import lombok.Generated;
 
 /**

@@ -13,7 +13,6 @@ import ${BasePackageName}.service.ObjectNotFoundException;
 import ${BasePackageName}.service.ObjectType;
 import ${BasePackageName}.${KeySONames.getQualifiedName()};
 import ${BasePackageName}.service.so.actions.adventurer.AdventurerChangeActionSO;
-import ${BasePackageName}.service.so.actions.adventurer.AdventurerNameChangeActionSO;
 #foreach($Item in ${AdditionalImports.getQualifiedClassNames()})
 import ${BasePackageName}.$Item;
 #end
