@@ -14,6 +14,7 @@ import lombok.Data;
 public class SimpleAttributeData {
 
 	private String attributeName;
+	private String attributeAsClassName;
 	private String keySOClassName;
 	private String setterName;
 	private String typeName;

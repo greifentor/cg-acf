@@ -50,7 +50,8 @@ public class CGCodeFactoryIntegrationTest {
 	@ParameterizedTest
 	@ValueSource(strings = { "de/ollie/chalkous9cp/service/FolkService.java",
 			"de/ollie/chalkous9cp/service/impl/FolkServiceImpl.java", "de/ollie/chalkous9cp/service/so/FolkKeySO.java",
-			"de/ollie/chalkous9cp/service/GeneratedAdventurerService.java" })
+			"de/ollie/chalkous9cp/service/GeneratedAdventurerService.java",
+			"de/ollie/chalkous9cp/service/impl/GeneratedAdventurerServiceImpl.java" })
 	public void generate_PassADataModel_CreatesCorrectFolkServiceInterface(String fileName) throws Exception {
 		if (new File(OUTPUT_PATH).exists()) {
 			Files.walk(Paths.get(OUTPUT_PATH)).sorted(Comparator.reverseOrder()).map(Path::toFile)

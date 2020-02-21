@@ -46,6 +46,11 @@
     <Tables>
         <Table activeInApplication="false" additionalCreateConstraint="" codeFolder="" codeGeneratorOptions="" colorBackground="goldgelb" colorForeground="schwarz" comment="" complexForeignKey="" contextName="" deprecated="false" draft="false" dynamicCode="true" externalTable="false" firstGenerationDone="false" generateCode="true" history="@changed OLI - Added." inherited="false" name="ADVENTURER" nmRelation="false" uniqueFormula="">
             <Column canBeReferenced="true" comment="" deprecated="false" domain="Name" editorAlterInBatchView="false" editorDisabled="false" editorLabelText="" editorMaxLength="0" editorMember="false" editorMnemonic="" editorPosition="0" editorReferenceWeight="NONE" editorResourceId="" editorToolTipText="" encrypted="false" global="false" globalId="false" hasIndex="false" hideReference="false" history="@changed OLI - Added." indexSearchMember="false" individualDefaultValue="" lastModificationField="false" listItemField="false" name="KEY" notNull="true" panelNumber="0" parameter="" primaryKey="true" removedStateField="false" required="false" sequenceForKeyGeneration="" suppressForeignKeyConstraints="false" technicalField="false" transient="false" unique="false" />
+            <Column canBeReferenced="false" comment="" deprecated="false" domain="Name" editorAlterInBatchView="false" editorDisabled="false" editorLabelText="" editorMaxLength="0" editorMember="false" editorMnemonic="" editorPosition="0" editorReferenceWeight="NONE" editorResourceId="" editorToolTipText="" encrypted="false" global="false" globalId="false" hasIndex="false" hideReference="false" history="@changed OLI - Added." indexSearchMember="false" individualDefaultValue="" lastModificationField="false" listItemField="false" name="WAY_OF_LIFE" notNull="true" panelNumber="0" parameter="" primaryKey="false" removedStateField="false" required="false" sequenceForKeyGeneration="" suppressForeignKeyConstraints="false" technicalField="false" transient="false" unique="false">
+                <Relation referenceColumnName="KEY" referenceTableName="WAY_OF_LIFE">
+                    <View direction0="RIGHT" direction1="LEFT" name="Main" offset0="25" offset1="25" />
+                </Relation>
+            </Column>
             <Column canBeReferenced="false" comment="" deprecated="false" domain="Name" editorAlterInBatchView="false" editorDisabled="false" editorLabelText="" editorMaxLength="0" editorMember="false" editorMnemonic="" editorPosition="0" editorReferenceWeight="NONE" editorResourceId="" editorToolTipText="" encrypted="false" global="false" globalId="false" hasIndex="false" hideReference="false" history="@changed OLI - Added." indexSearchMember="false" individualDefaultValue="" lastModificationField="false" listItemField="false" name="NAME" notNull="false" panelNumber="0" parameter="" primaryKey="false" removedStateField="false" required="false" sequenceForKeyGeneration="" suppressForeignKeyConstraints="false" technicalField="false" transient="false" unique="false" />
             <Options>
                 <Option name="GENERATE" parameter="PERSIST_AS_HISTORY" />
@@ -71,6 +76,17 @@
             </Options>
             <Panel panelClass="" panelNumber="0" tabMnemonic="1" tabTitle="data" tabToolTipText="Hier k&amp;ouml;nnen Sie die Daten des Objekt warten" />
             <View name="Main" x="25" y="125" />
+        </Table>
+        <Table activeInApplication="false" additionalCreateConstraint="" codeFolder="" codeGeneratorOptions="" colorBackground="pastell-gr&amp;uuml;n" colorForeground="schwarz" comment="" complexForeignKey="" contextName="" deprecated="false" draft="false" dynamicCode="true" externalTable="false" firstGenerationDone="false" generateCode="true" history="@changed OLI - Added." inherited="false" name="WAY_OF_LIFE" nmRelation="false" uniqueFormula="">
+            <Column canBeReferenced="true" comment="" deprecated="false" domain="Name" editorAlterInBatchView="false" editorDisabled="false" editorLabelText="" editorMaxLength="0" editorMember="false" editorMnemonic="" editorPosition="0" editorReferenceWeight="NONE" editorResourceId="" editorToolTipText="" encrypted="false" global="false" globalId="false" hasIndex="false" hideReference="false" history="@changed OLI - Added." indexSearchMember="false" individualDefaultValue="" lastModificationField="false" listItemField="false" name="KEY" notNull="true" panelNumber="0" parameter="" primaryKey="true" removedStateField="false" required="false" sequenceForKeyGeneration="" suppressForeignKeyConstraints="false" technicalField="false" transient="false" unique="false" />
+            <Column canBeReferenced="false" comment="" deprecated="false" domain="Name" editorAlterInBatchView="false" editorDisabled="false" editorLabelText="" editorMaxLength="0" editorMember="false" editorMnemonic="" editorPosition="0" editorReferenceWeight="NONE" editorResourceId="" editorToolTipText="" encrypted="false" global="false" globalId="false" hasIndex="false" hideReference="false" history="@changed OLI - Added." indexSearchMember="false" individualDefaultValue="" lastModificationField="false" listItemField="false" name="NAME" notNull="true" panelNumber="0" parameter="" primaryKey="false" removedStateField="false" required="false" sequenceForKeyGeneration="" suppressForeignKeyConstraints="false" technicalField="false" transient="false" unique="false" />
+            <Options>
+                <Option name="GENERATE" parameter="KEY_STORAGE" />
+                <Option name="KEY_VALUES" parameter="WAY_OF_SORCERY,$BR$WAY_OF_SWORDS" />
+                <Option name="PLURAL" parameter="ways_of_life" />
+            </Options>
+            <Panel panelClass="" panelNumber="0" tabMnemonic="1" tabTitle="data" tabToolTipText="Hier k&amp;ouml;nnen Sie die Daten des Objekt warten" />
+            <View name="Main" x="675" y="125" />
         </Table>
     </Tables>
     <Views>

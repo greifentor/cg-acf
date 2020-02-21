@@ -31,6 +31,7 @@ import de.ollie.archimedes.alexandrian.service.TableSO;
 import de.ollie.cgacf.service.KeySOClassGenerator;
 import de.ollie.cgacf.service.KeyStorageServiceImplClassGenerator;
 import de.ollie.cgacf.service.KeyStorageServiceInterfaceGenerator;
+import de.ollie.cgacf.service.PersistAsHistoryServiceImplClassGenerator;
 import de.ollie.cgacf.service.PersistAsHistoryServiceInterfaceGenerator;
 
 /**
@@ -48,7 +49,7 @@ public class CGCodeFactory
 
 	private static final String FACTORY_NAME = "Charakter Generator Code Factory";
 	private static final String LABEL_STARTING = "starting";
-	private static final int MAX_PROCESSES = 4;
+	private static final int MAX_PROCESSES = 5;
 
 	private static final Logger LOG = Logger.getLogger(CGCodeFactory.class);
 
@@ -98,6 +99,11 @@ public class CGCodeFactory
 				this.nameManager::getGeneratedServiceInterfaceNamesProvider);
 		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Generated Service Interface", null, "done",
 				null, 4, null, MAX_PROCESSES));
+		createSourceFiles(database, path, basePackageName,
+				new PersistAsHistoryServiceImplClassGenerator(this.nameManager, this.typeManager),
+				this.nameManager::getGeneratedServiceImplClassNamesProvider);
+		fireCodeFactoryProgressionEvent(new CodeFactoryProgressionEvent("Generated Service Impl Class", null, "done",
+				null, 5, null, MAX_PROCESSES));
 		return false;
 	}
 

@@ -2,6 +2,9 @@
 package ${BasePackageName}.service;
 
 import ${BasePackageName}.${KeySONames.getQualifiedName()};
+#foreach($Item in ${AdditionalImports.getQualifiedClassNames()})
+import ${BasePackageName}.$Item;
+#end
 import lombok.Generated;
 
 /**
@@ -10,7 +13,7 @@ import lombok.Generated;
  * GENERATED CODE !!! DO NOT CHANGE !!!
  */
 @Generated
-public interface $ClassName {
+public interface $ClassName extends ${ServiceInterface.getClassName()} {
 
 #foreach($Item in $SimpleAttributes)
 	void $Item.getSetterName()(${Item.getKeySOClassName()} key, ${Item.getTypeName()} ${Item.getAttributeName()});

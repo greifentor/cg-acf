@@ -1,10 +1,12 @@
 package de.ollie.cgacf;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import de.ollie.acf.utils.NameManager;
 import de.ollie.acf.utils.TypeManager;
+import de.ollie.archimedes.alexandrian.service.ColumnSO;
 import de.ollie.archimedes.alexandrian.service.TableSO;
 
 /**
@@ -34,6 +36,24 @@ abstract public class AbstractCodeGenerator { // NOSONAR
 
 	public String getName() {
 		return this.name;
+	}
+
+	protected String getTypeName(ColumnSO column) {
+		Optional<TableSO> table = getReferencedTable(column);
+		if (table.isPresent()) {
+			return this.nameManager.getKeySONamesProvider(table.get()).getClassName();
+		}
+		return this.typeManager.typeSOToTypeString(column);
+	}
+
+	protected Optional<TableSO> getReferencedTable(ColumnSO column) {
+		return column.getTable().getForeignKeys() //
+				.stream() //
+				.flatMap(fk -> fk.getReferences().stream()) //
+				.filter(r -> r.getReferencingColumn() == column) //
+				.map(r -> r.getReferencedColumn().getTable()) //
+				.findAny() //
+		;
 	}
 
 }

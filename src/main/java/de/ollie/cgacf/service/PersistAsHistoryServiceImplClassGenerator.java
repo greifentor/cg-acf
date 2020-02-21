@@ -19,29 +19,31 @@ import de.ollie.cgacf.AbstractCodeGenerator;
 import de.ollie.cgacf.service.data.SimpleAttributeData;
 
 /**
- * A code generator for service interfaces in persist as history mode.
+ * A code generator for service impl class in persist as history mode.
  *
- * @author ollie (17.02.2020)
+ * @author ollie (19.02.2020)
  */
-public class PersistAsHistoryServiceInterfaceGenerator extends AbstractCodeGenerator {
+public class PersistAsHistoryServiceImplClassGenerator extends AbstractCodeGenerator {
 
-	public PersistAsHistoryServiceInterfaceGenerator(NameManager nameManager, TypeManager typeManager) {
-		super("PersistAsHistoryServiceInterfaceGenerator", nameManager, typeManager);
+	public PersistAsHistoryServiceImplClassGenerator(NameManager nameManager, TypeManager typeManager) {
+		super("PersistAsHistoryServiceImplClassGenerator", nameManager, typeManager);
 	}
 
 	@Override
 	public String generate(String templatePath, String basePackageName, TableSO table) throws Exception {
 		VelocityEngine velocityEngine = new VelocityEngine();
 		velocityEngine.init();
-		Template t = velocityEngine.getTemplate(templatePath + "/PersistAsHistoryServiceInterface.vm");
+		Template t = velocityEngine.getTemplate(templatePath + "/PersistAsHistoryServiceImplClass.vm");
 		VelocityContext context = new VelocityContext();
 		ImportManager importManager = new ImportManager();
 		context.put("BasePackageName", basePackageName);
+		context.put("BasicClassName", this.nameManager.getClassName(table));
+		context.put("GeneratedServiceInterface", this.nameManager.getGeneratedServiceInterfaceNamesProvider(table));
 		context.put("KeySONames", this.nameManager.getKeySONamesProvider(table));
-		context.put("NamesProvider", this.nameManager.getGeneratedServiceInterfaceNamesProvider(table));
+		context.put("NamesProvider", this.nameManager.getGeneratedServiceImplClassNamesProvider(table));
 		context.put("PluralName", this.nameManager.getPluralName(table));
-		context.put("ServiceInterface", this.nameManager.getServiceInterfaceNamesProvider(table));
-		context.put("SimpleAttributes", getSimpleAttributes(table, importManager));
+		context.put("ServiceImplClass", this.nameManager.getServiceImplClassNamesProvider(table));
+		context.put("SimpleAttributes", this.getSimpleAttributes(table, importManager));
 		context.put("SingularName", this.nameManager.getClassName(table).toLowerCase());
 		context.put("SONames", this.nameManager.getSONamesProvider(table));
 		context.put("AdditionalImports", importManager);
@@ -55,8 +57,11 @@ public class PersistAsHistoryServiceInterfaceGenerator extends AbstractCodeGener
 				.stream() //
 				.filter(column -> !column.isPkMember()) //
 				.map(column -> {
-					getReferencedTable(column).ifPresent(
-							rt -> importManager.add(nameManager.getKeySONamesProvider(rt).getQualifiedName()));
+					getReferencedTable(column).ifPresent(rt -> {
+						importManager.add(this.nameManager.getKeySONamesProvider(rt).getQualifiedName());
+						importManager.add("service.so.actions.adventurer.Adventurer" + nameManager.getClassName(rt)
+								+ "ChangeActionSO");
+					});
 					return new SimpleAttributeData( //
 							this.nameManager.columnNameToAttributeName(column), //
 							this.nameManager.getClassName(column.getName()), //

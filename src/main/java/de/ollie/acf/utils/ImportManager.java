@@ -41,4 +41,13 @@ public class ImportManager {
 		return (code.length() > 0 ? code.toString() + "\n" : "");
 	}
 
+	/**
+	 * Returns a list of qualified class names to import.
+	 * 
+	 * @return A list of qualified class names to import.
+	 */
+	public List<String> getQualifiedClassNames() {
+		return new ArrayList<>(this.imports);
+	}
+
 }

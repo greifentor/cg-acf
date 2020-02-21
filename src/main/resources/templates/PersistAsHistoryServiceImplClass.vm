@@ -1,0 +1,53 @@
+#set( $ClassName = ${NamesProvider.getClassName()} )
+package ${BasePackageName}.${NamesProvider.getPackageName()};
+
+import static de.ollie.utils.Check.ensure;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import ${BasePackageName}.${GeneratedServiceInterface.getQualifiedName()};
+import ${BasePackageName}.service.ObjectNotFoundException;
+import ${BasePackageName}.service.ObjectType;
+import ${BasePackageName}.${KeySONames.getQualifiedName()};
+import ${BasePackageName}.service.so.actions.adventurer.AdventurerChangeActionSO;
+import ${BasePackageName}.service.so.actions.adventurer.AdventurerNameChangeActionSO;
+#foreach($Item in ${AdditionalImports.getQualifiedClassNames()})
+import ${BasePackageName}.$Item;
+#end
+import lombok.Generated;
+
+/**
+ * A basic service for ${SingularName} data management.
+ *
+ * GENERATED CODE !!! DO NOT CHANGE !!!
+ */
+@Generated
+public abstract class $ClassName implements $GeneratedServiceInterface.getClassName() {
+
+	protected Map<AdventurerKeySO, List<AdventurerChangeActionSO>> adventurers = new HashMap<>();
+
+#foreach($Item in $SimpleAttributes)
+	@Override
+	public void $Item.getSetterName()(final ${Item.getKeySOClassName()} key, final ${Item.getTypeName()} ${Item.getAttributeName()}) {
+		ensure(${Item.getAttributeName()} != null, "${Item.getAttributeName()} cannot be null.");
+		getChangeActions(key).ifPresentOrElse( //
+				actions -> actions.add(new ${BasicClassName}${Item.getAttributeAsClassName()}ChangeActionSO(${Item.getAttributeName()})), //
+				() -> {
+					throw new ObjectNotFoundException(key.getValue(), ObjectType.ADVENTURER);
+				});
+	}
+
+#end
+	protected Optional<List<AdventurerChangeActionSO>> getChangeActions(AdventurerKeySO key) {
+		ensure(key != null, "key cannot be null.");
+		List<AdventurerChangeActionSO> l = this.adventurers.get(key);
+		if (l != null) {
+			return Optional.of(l);
+		}
+		return Optional.empty();
+	}
+
+}

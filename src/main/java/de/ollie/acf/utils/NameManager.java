@@ -73,17 +73,28 @@ public class NameManager {
 	 * @throws NullPointerException     Passing a table null value.
 	 */
 	public String getClassName(TableSO table) {
-		String tableName = table.getName();
-		ensure(!tableName.isEmpty(), "table name cannot be empty.");
-		if (containsUnderScores(tableName)) {
-			tableName = buildTableNameFromUnderScoreString(tableName);
-		} else if (allCharactersAreUpperCase(tableName)) {
-			tableName = tableName.toLowerCase();
+		return getClassName(table.getName());
+	}
+
+	/**
+	 * Returns a well formed class name for the passed table.
+	 *
+	 * @param s The String which should be created a class name for..
+	 * @return A well formed class name for the passed string.
+	 * @throws IllegalArgumentException Passing an empty string.
+	 * @throws NullPointerException     Passing a null value.
+	 */
+	public String getClassName(String s) {
+		ensure(!s.isEmpty(), "table name cannot be empty.");
+		if (containsUnderScores(s)) {
+			s = buildTableNameFromUnderScoreString(s);
+		} else if (allCharactersAreUpperCase(s)) {
+			s = s.toLowerCase();
 		}
-		if (startsWithLowerCaseCharacter(tableName)) {
-			tableName = firstCharToUpperCase(tableName);
+		if (startsWithLowerCaseCharacter(s)) {
+			s = firstCharToUpperCase(s);
 		}
-		return tableName;
+		return s;
 	}
 
 	private boolean containsUnderScores(String s) {
@@ -151,6 +162,19 @@ public class NameManager {
 				.findAny() //
 				.map(OptionSO::getValue) //
 				.orElse(firstCharToLowerCase(getClassName(table)) + "s") //
+		;
+	}
+
+	/**
+	 * Returns the names provider for a generated service impl class of the passed table.
+	 * 
+	 * @param table The table which the generated service impl class name is to find for.
+	 * @return The names provider for a generated service impl class of the passed table.
+	 */
+	public NamesProvider getGeneratedServiceImplClassNamesProvider(TableSO table) {
+		return new NamesProvider() //
+				.setClassName("Generated" + getClassName(table) + "ServiceImpl") //
+				.setPackageName("service.impl") //
 		;
 	}
 
